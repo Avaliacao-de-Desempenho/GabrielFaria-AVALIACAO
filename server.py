@@ -1,4 +1,5 @@
 import base64
+import json
 import os
 
 import requests
@@ -30,6 +31,14 @@ async def processar_documento(arquivo: UploadFile = File(...)):
 
     Parâmetros:
         arquivo (UploadFile): Imagem da nota fiscal enviada via API.
+
+    Retorno:
+        JSON no seguinte formato:
+        {
+            "Valor": "R$XXX,XX",
+            "CNPJ": "XX.XXX.XXX/XXXX-XX",
+            "Data": "DD/MM/YYYY"
+        }
     """
     # Recupera o arquivo na forma de bytes
     conteudo = await arquivo.read()
@@ -50,14 +59,29 @@ async def processar_documento(arquivo: UploadFile = File(...)):
                             "data": arquivo_base64,
                         }
                     },
-                    {"text": "Descreva o que está nesta imagem."},
+                    {
+                        "text": """
+                        Me retorne os campos Valor Total, CNPJ e Data de Emissão desta nota fiscal. 
+                        Não me retorne nenhum texto adicional, além dos campos formatados nesse formato:
+                        {
+                            "Valor": campo_valor_extraido_do_arquivo, 
+                            "CNPJ": campo_cnpj_extraido_do_arquivo,
+                            "Data": campo_data_extraido_do_arquivo,
+                        }
+                        Caso os campos não sejam encontrados, substituir o valor extraído do arquivo por 'null'.
+                        Não me retorne os dados formatados ou com espaçamento de linha entre eles. 
+                        Retorne apenas a string pura contendo os campos e valores que forneci.
+                    """
+                    },
                 ]
             }
         ]
     }
 
+    # Realiza a requisição, passando a imagem, prompt e headers para a API do Gemini
     resposta = requests.post(ENDPOINT_GEMINI, headers=headers, json=payload)
 
+    # Retorna erro, caso haja algum
     if resposta.status_code != 200:
         return JSONResponse(
             status_code=500,
@@ -67,5 +91,18 @@ async def processar_documento(arquivo: UploadFile = File(...)):
             },
         )
 
-    resultado = resposta.json()
-    return resultado
+    # Retorna resultado do gemini
+    resposta_json = resposta.json()
+    # Dentro dos metadados que o Gemini retorna, obtém o real retorno do prompt, ou seja, os campos Valor, CNPJ e Data
+    campos = resposta_json["candidates"][0]["content"]["parts"][0]["text"]
+    # O Gemini retorna os valores dentro de um markdown, por isso, substitui as partes que definem o markdown com strings vazias
+    campos_formatado = json.loads(campos.replace("```json\n", "").replace("\n```", ""))
+
+    # Cria o JSON de retorno com os campos devidamente formatados
+    valor_retorno = {
+        "Valor": campos_formatado["Valor"],
+        "CNPJ": campos_formatado["CNPJ"],
+        "Data": campos_formatado["Data"],
+    }
+
+    return valor_retorno
