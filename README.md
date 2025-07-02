@@ -2,16 +2,16 @@
 ### Objetivo: Integrar API FastAPI com API do Gemini 
 **02/07 - 04/07**
 - **Backlog Semanal**
-    - Obter chave da API Gemini, estudar documentação para futura integração
-    - Desenvolver API `FastAPI` em Python com métodos básicos (GET, POST, ...)
-    - Integrar upload de imagem à API
-    - Integrar API `FastAPI` com a API do Gemini, por meio de requisição via `requests` (python)
-    - Desenvolver prompt e formatar retorno do Gemini para um `JSON` padronizado
-    - Desenvolver `docker-compose` e rodar a API em um contâiner local
+    - Obter chave da API Gemini, estudar documentação para futura integração ✅
+    - Desenvolver API `FastAPI` em Python com métodos básicos (GET, POST, ...) ✅
+    - Integrar upload de imagem à API ✅
+    - Integrar API `FastAPI` com a API do Gemini, por meio de requisição via `requests` (python) ✅
+    - Desenvolver prompt e formatar retorno do Gemini para um `JSON` padronizado ✅
+    - Desenvolver `docker-compose` e rodar a API em um contâiner local 🕒
 
 - **Resultado Esperado**
     - API desenvolvida em `FastAPI` que envia  um arquivo de uma nota fiscal e retorna o Valor Total, Data de Emissão e CNPJ em um `JSON` padronizado.
-    - Evolução: 0%
+    - Evolução: 83%
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
     - \<DÚVIDAS\>
