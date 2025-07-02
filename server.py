@@ -1,7 +1,9 @@
 import base64
 import os
 
+import requests
 from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
 
 # Instancia uma aplicação FastAPI
 app = FastAPI(
@@ -31,7 +33,39 @@ async def processar_documento(arquivo: UploadFile = File(...)):
     """
     # Recupera o arquivo na forma de bytes
     conteudo = await arquivo.read()
-    with open("teste.png", "wb") as imagem:
-        imagem.write(conteudo)
+    # Converte o arquivo (bytes) para base64, para enviar para o Gemini
+    arquivo_base64 = base64.b64encode(conteudo).decode("utf-8")
 
-    return {"teste": "foi"}
+    # Monta o cabecalho da requisição, passando a chave da API
+    headers = {"Content-Type": "application/json", "X-goog-api-key": CHAVE_API_GEMINI}
+
+    # Monta o payload para o gemini
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "inline_data": {
+                            "mime_type": arquivo.content_type,
+                            "data": arquivo_base64,
+                        }
+                    },
+                    {"text": "Descreva o que está nesta imagem."},
+                ]
+            }
+        ]
+    }
+
+    resposta = requests.post(ENDPOINT_GEMINI, headers=headers, json=payload)
+
+    if resposta.status_code != 200:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "erro": "Erro ao processar imagem no Gemini",
+                "detalhe": resposta.text,
+            },
+        )
+
+    resultado = resposta.json()
+    return resultado
