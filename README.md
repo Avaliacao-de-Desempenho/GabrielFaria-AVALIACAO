@@ -11,7 +11,9 @@
 
 - **Resultado Esperado**
     - API desenvolvida em `FastAPI` que envia  um arquivo de uma nota fiscal e retorna o Valor Total, Data de Emissão e CNPJ em um `JSON` padronizado.
-    - Evolução: 83%
+      - **02/07** - Em primeiro momento, criei uma chave da API Gemini e defini - com a ajuda do `PyPi` as dependências que necessitaria para a primeira parte do projeto. Com as dependências instaladas em um ambiente virtual `venv`, desenvolvi uma API simples com um único método `GET` que retornava um `Hello World`. A partir dessa API, comecei a desenvolver a aplicação em si, iniciando pelo método `POST`, que inicialmente recebia uma imagem e salvava no meu ambiente local. Vendo que a integração do `POST` com uma imagem funcionava, integrei a chave da API que tinha conseguido anteriormente e comecei fazendo requisições simples ao endpoint do Gemini com o intuito de testes. Com a requisição ao Gemini integrada, desenvolvi o prompt que iria utilizar e formatei o retorno em um `JSON` padronizado contendo apenas os campos requiridos (valor, CNPJ e data).
+        - **Evolução**: 83%
+        - **TODO**: Desenvolver `Dockerfile` e `docker-compose`, integrar com o banco de dados.
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
     - \<DÚVIDAS\>
