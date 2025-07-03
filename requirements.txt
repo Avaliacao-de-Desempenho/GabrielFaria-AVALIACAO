@@ -1,4 +1,4 @@
 fastapi
 fastapi[standard]
 requests
-psycopg2-binary
+psycopg[binary]

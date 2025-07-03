@@ -2,7 +2,7 @@ import base64
 import json
 import os
 
-import psycopg2
+import psycopg
 import requests
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
@@ -26,7 +26,7 @@ def conectar_banco():
     Caso a conexão com o banco falhe, retorna a exceção formatada como string.
     """
     try:
-        conexao = psycopg2.connect(
+        conexao = psycopg.connect(
             dbname=os.environ["DB_POSTGRES"],
             user=os.environ["USUARIO_POSTGRES"],
             password=os.environ["SENHA_POSTGRES"],
