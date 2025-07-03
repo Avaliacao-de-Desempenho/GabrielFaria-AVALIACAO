@@ -93,6 +93,8 @@ O ambiente local deve estar num ambiente virtual, criado com o "venv", e os paco
 - FastAPI
     - https://fastapi.tiangolo.com/tutorial/
     - https://fastapi.tiangolo.com/tutorial/first-steps/#step-4-define-the-path-operation-function
+    - https://pypi.org/project/fastapi/
+    - https://www.youtube.com/watch?v=7eCdONqaHDc
 - Banco de dados
     - https://www.postgresql.org/
     - https://pypi.org/project/SQLAlchemy/
