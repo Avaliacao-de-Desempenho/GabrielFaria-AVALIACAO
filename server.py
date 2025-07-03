@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 app = FastAPI(
     title="API - Analizador de notas fiscais",
     description="API desenvolvida utilizando FastAPI que integra a API do Gemini para recuperar campos de notas fiscais.",
-    version="0.1.0",
+    version="1.0.0",
 )
 
 
@@ -21,6 +21,10 @@ ENDPOINT_GEMINI = os.environ.get("ENDPOINT_GEMINI")
 
 
 def conectar_banco():
+    """
+    Função responsável por criar uma conexão com o banco de dados postgres.
+    Caso a conexão com o banco falhe, retorna a exceção formatada como string.
+    """
     try:
         conexao = psycopg2.connect(
             dbname=os.environ["DB_POSTGRES"],
@@ -36,14 +40,21 @@ def conectar_banco():
 
 @app.get("/")
 def get_notas():
+    """
+    Retorna todos os dados de nota fiscal do banco de dados postgres
+    """
+    # Tenta se conectar com o banco
     conexao = conectar_banco()
+    # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
     if not isinstance(conexao, str):
         cursor = conexao.cursor()
 
+        # Cria a tabela caso ela não exista (precaução)
         cursor.execute(
             "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
         )
 
+        # Retorna todos os dados da tabela "notas"
         cursor.execute("SELECT * FROM notas")
         resultado = cursor.fetchall()
 
@@ -54,6 +65,7 @@ def get_notas():
 
         return resultado
     else:
+        # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
         return {"Erro": conexao}
 
 
@@ -97,7 +109,7 @@ async def processar_documento(arquivo: UploadFile = File(...)):
                         Me retorne os campos Valor Total, CNPJ e Data de Emissão desta nota fiscal. 
                         Não me retorne nenhum texto adicional, além dos campos formatados nesse formato:
                         {
-                            "Valor": campo_valor_extraido_do_arquivo formatado como R$XXX.XX, lembre-se de trocar a vírgula por um ponto, 
+                            "Valor": campo_valor_extraido_do_arquivo formatado como R$XXX.XX, lembre-se de trocar a vírgula por um ponto, deixando no formato americano de dinheiro, 
                             "CNPJ": campo_cnpj_extraido_do_arquivo formatado como XX.XXX.XXX/XXXX-XX,
                             "Data": campo_data_extraido_do_arquivo formatado como YYYY/MM/DD,
                         }
@@ -138,17 +150,23 @@ async def processar_documento(arquivo: UploadFile = File(...)):
         "Data": campos_formatado["Data"],
     }
 
+    # Tenta se conectar com o banco
     conexao = conectar_banco()
+    # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
     if not isinstance(conexao, str):
         cursor = conexao.cursor()
 
+        # Cria a tabela se ela não existir (precaução)
         cursor.execute(
             "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
         )
+        # Insere os valores formatados na tabela
         cursor.execute(
             "INSERT INTO notas (valor, cnpj, data) VALUES (%s, %s, %s)",
             (
-                float(campos_formatado["Valor"].split("$")[1]),
+                float(
+                    campos_formatado["Valor"].split("$")[1]
+                ),  # Extrai somente o valor formatado como float (exclui o R$)
                 campos_formatado["CNPJ"],
                 campos_formatado["Data"],
             ),
