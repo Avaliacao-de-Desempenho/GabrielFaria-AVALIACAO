@@ -2,6 +2,7 @@ import base64
 import json
 import os
 
+import psycopg2
 import requests
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
@@ -19,9 +20,41 @@ CHAVE_API_GEMINI = os.environ.get("CHAVE_API_GEMINI")
 ENDPOINT_GEMINI = os.environ.get("ENDPOINT_GEMINI")
 
 
+def conectar_banco():
+    try:
+        conexao = psycopg2.connect(
+            dbname=os.environ["DB_POSTGRES"],
+            user=os.environ["USUARIO_POSTGRES"],
+            password=os.environ["SENHA_POSTGRES"],
+            host="db",
+            port="5432",
+        )
+        return conexao
+    except Exception as e:
+        return str(e)
+
+
 @app.get("/")
-def get_teste():
-    return {"Hello": "World"}
+def get_notas():
+    conexao = conectar_banco()
+    if not isinstance(conexao, str):
+        cursor = conexao.cursor()
+
+        cursor.execute(
+            "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
+        )
+
+        cursor.execute("SELECT * FROM notas")
+        resultado = cursor.fetchall()
+
+        conexao.commit()
+
+        cursor.close()
+        conexao.close()
+
+        return resultado
+    else:
+        return {"Erro": conexao}
 
 
 @app.post("/docs/")
@@ -35,9 +68,9 @@ async def processar_documento(arquivo: UploadFile = File(...)):
     Retorno:
         JSON no seguinte formato:
         {
-            "Valor": "R$XXX,XX",
+            "Valor": "R$XXX.XX",
             "CNPJ": "XX.XXX.XXX/XXXX-XX",
-            "Data": "DD/MM/YYYY"
+            "Data": "YYYY/MM/DD"
         }
     """
     # Recupera o arquivo na forma de bytes
@@ -64,9 +97,9 @@ async def processar_documento(arquivo: UploadFile = File(...)):
                         Me retorne os campos Valor Total, CNPJ e Data de Emissão desta nota fiscal. 
                         Não me retorne nenhum texto adicional, além dos campos formatados nesse formato:
                         {
-                            "Valor": campo_valor_extraido_do_arquivo, 
-                            "CNPJ": campo_cnpj_extraido_do_arquivo,
-                            "Data": campo_data_extraido_do_arquivo,
+                            "Valor": campo_valor_extraido_do_arquivo formatado como R$XXX.XX, lembre-se de trocar a vírgula por um ponto, 
+                            "CNPJ": campo_cnpj_extraido_do_arquivo formatado como XX.XXX.XXX/XXXX-XX,
+                            "Data": campo_data_extraido_do_arquivo formatado como YYYY/MM/DD,
                         }
                         Caso os campos não sejam encontrados, substituir o valor extraído do arquivo por 'null'.
                         Não me retorne os dados formatados ou com espaçamento de linha entre eles. 
@@ -105,4 +138,27 @@ async def processar_documento(arquivo: UploadFile = File(...)):
         "Data": campos_formatado["Data"],
     }
 
-    return valor_retorno
+    conexao = conectar_banco()
+    if not isinstance(conexao, str):
+        cursor = conexao.cursor()
+
+        cursor.execute(
+            "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
+        )
+        cursor.execute(
+            "INSERT INTO notas (valor, cnpj, data) VALUES (%s, %s, %s)",
+            (
+                float(campos_formatado["Valor"].split("$")[1]),
+                campos_formatado["CNPJ"],
+                campos_formatado["Data"],
+            ),
+        )
+
+        conexao.commit()
+
+        cursor.close()
+        conexao.close()
+
+        return valor_retorno
+    else:
+        return {"Erro": conexao}

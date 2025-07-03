@@ -10,5 +10,26 @@ services:
       - "8000:8000"
     volumes:
       - ./app:/app
-    depends_on: []
+    depends_on: 
+      - db
     command: uvicorn server:app --host 0.0.0.0 --port 8000
+    env_file:
+      - .env
+
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${USUARIO_POSTGRES}
+      POSTGRES_PASSWORD: ${SENHA_POSTGRES}
+      POSTGRES_DB: ${DB_POSTGRES}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
