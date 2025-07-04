@@ -23,7 +23,7 @@ const NotaUploader = () => {
       setCarregando(true)
       setErro(null)
 
-      const response = await axios.post("http://localhost:8000/docs/", formData, {
+      const response = await axios.post("http://localhost:8000/notas/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -31,7 +31,7 @@ const NotaUploader = () => {
 
       setResultado(response.data)
     } catch (err: any) {
-      setErro(err.response?.data?.erro || "Erro ao processar")
+      setErro( err?.response?.data?.erro || err?.message || "Erro ao processar")
     } finally {
       setCarregando(false)
     }
