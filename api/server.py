@@ -6,6 +6,7 @@ import psycopg
 import requests
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 # Instancia uma aplicação FastAPI
 app = FastAPI(
@@ -14,6 +15,14 @@ app = FastAPI(
     version="1.0.0",
 )
 
+# Adiciona CORS para o front conseguir acessar a API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Recupera variáveis relativas à integração com GEMINI do .env
 CHAVE_API_GEMINI = os.environ.get("CHAVE_API_GEMINI")
