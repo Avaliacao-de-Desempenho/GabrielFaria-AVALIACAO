@@ -75,7 +75,7 @@ def retorna_notas():
                 return json_retorno
         else:
             # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
-            return {"Erro": conexao}
+            return JSONResponse(status_code=500, content={"Erro": conexao})
 
 
 @app.post("/notas/")
@@ -94,105 +94,119 @@ async def processar_documento(arquivo: UploadFile = File(...)):
             "Data": "YYYY/MM/DD"
         }
     """
-    # Recupera o arquivo na forma de bytes
-    conteudo = await arquivo.read()
-    # Converte o arquivo (bytes) para base64, para enviar para o Gemini
-    arquivo_base64 = base64.b64encode(conteudo).decode("utf-8")
+    try:
+        # Recupera o arquivo na forma de bytes
+        conteudo = await arquivo.read()
+        # Converte o arquivo (bytes) para base64, para enviar para o Gemini
+        arquivo_base64 = base64.b64encode(conteudo).decode("utf-8")
 
-    # Monta o cabecalho da requisição, passando a chave da API
-    headers = {"Content-Type": "application/json", "X-goog-api-key": CHAVE_API_GEMINI}
+        # Monta o cabecalho da requisição, passando a chave da API
+        headers = {
+            "Content-Type": "application/json",
+            "X-goog-api-key": CHAVE_API_GEMINI,
+        }
 
-    # Monta o payload para o Gemini
-    payload = {
-        "contents": [
-            {
-                "parts": [
-                    {
-                        "inline_data": {
-                            "mime_type": arquivo.content_type,
-                            "data": arquivo_base64,
-                        }
-                    },
-                    {
-                        "text": """
-                        Me retorne os campos Valor Total, CNPJ e Data de Emissão desta nota fiscal. 
-                        Não me retorne nenhum texto adicional, além dos campos formatados nesse formato:
+        # Monta o payload para o Gemini
+        payload = {
+            "contents": [
+                {
+                    "parts": [
                         {
-                            "Valor": campo_valor_extraido_do_arquivo formatado como R$XXX.XX, lembre-se de trocar a vírgula por um ponto, deixando no formato americano de dinheiro, 
-                            "CNPJ": campo_cnpj_extraido_do_arquivo formatado como XX.XXX.XXX/XXXX-XX,
-                            "Data": campo_data_extraido_do_arquivo formatado como YYYY/MM/DD,
-                        }
-                        Caso os campos não sejam encontrados, substituir o valor extraído do arquivo por 'null'.
-                        Não me retorne os dados formatados ou com espaçamento de linha entre eles. 
-                        Retorne apenas a string pura contendo os campos e valores que forneci.
-                    """
-                    },
-                ]
-            }
-        ]
-    }
+                            "inline_data": {
+                                "mime_type": arquivo.content_type,
+                                "data": arquivo_base64,
+                            }
+                        },
+                        {
+                            "text": """
+                            Me retorne os campos Valor Total, CNPJ e Data de Emissão desta nota fiscal. 
+                            Não me retorne nenhum texto adicional, além dos campos formatados nesse formato:
+                            {
+                                "Valor": campo_valor_extraido_do_arquivo formatado como R$XXX.XX, lembre-se de trocar a vírgula por um ponto, deixando no formato americano de dinheiro, 
+                                "CNPJ": campo_cnpj_extraido_do_arquivo formatado como XX.XXX.XXX/XXXX-XX,
+                                "Data": campo_data_extraido_do_arquivo formatado como YYYY/MM/DD,
+                            }
+                            Caso os campos não sejam encontrados, substituir o valor extraído do arquivo por 'null'.
+                            Não me retorne os dados formatados ou com espaçamento de linha entre eles. 
+                            Retorne apenas a string pura contendo os campos e valores que forneci.
+                        """
+                        },
+                    ]
+                }
+            ]
+        }
 
-    # Realiza a requisição, passando a imagem, prompt e headers para a API do Gemini
-    resposta = requests.post(ENDPOINT_GEMINI, headers=headers, json=payload)
+        # Realiza a requisição, passando a imagem, prompt e headers para a API do Gemini
+        resposta = requests.post(ENDPOINT_GEMINI, headers=headers, json=payload)
 
-    # Retorna erro, caso haja algum
-    if resposta.status_code != 200:
-        return JSONResponse(
-            status_code=500,
-            content={
-                "erro": "Erro ao processar imagem no Gemini",
-                "detalhe": resposta.text,
-            },
+        # Retorna erro, caso haja algum
+        if resposta.status_code != 200:
+            return JSONResponse(
+                status_code=500,
+                content={
+                    "erro": "Erro ao processar imagem no Gemini",
+                    "detalhe": resposta.text,
+                },
+            )
+
+        # Retorna resultado do gemini
+        resposta_json = resposta.json()
+        # Dentro dos metadados que o Gemini retorna, obtém o real retorno do prompt, ou seja, os campos Valor, CNPJ e Data
+        campos = resposta_json["candidates"][0]["content"]["parts"][0]["text"]
+        # O Gemini retorna os valores dentro de um markdown, por isso, substitui as partes que definem o markdown com strings vazias
+        campos_formatado = json.loads(
+            campos.replace("```json\n", "").replace("\n```", "")
         )
 
-    # Retorna resultado do gemini
-    resposta_json = resposta.json()
-    # Dentro dos metadados que o Gemini retorna, obtém o real retorno do prompt, ou seja, os campos Valor, CNPJ e Data
-    campos = resposta_json["candidates"][0]["content"]["parts"][0]["text"]
-    # O Gemini retorna os valores dentro de um markdown, por isso, substitui as partes que definem o markdown com strings vazias
-    campos_formatado = json.loads(campos.replace("```json\n", "").replace("\n```", ""))
+        # Cria o JSON de retorno com os campos devidamente formatados
+        valor_retorno = {
+            "Valor": campos_formatado["Valor"],
+            "CNPJ": campos_formatado["CNPJ"],
+            "Data": campos_formatado["Data"],
+        }
 
-    # Cria o JSON de retorno com os campos devidamente formatados
-    valor_retorno = {
-        "Valor": campos_formatado["Valor"],
-        "CNPJ": campos_formatado["CNPJ"],
-        "Data": campos_formatado["Data"],
-    }
+        # Tenta se conectar com o banco
+        conexao = conectar_banco()
+        # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
+        if not isinstance(conexao, str):
+            cursor = conexao.cursor()
 
-    # Tenta se conectar com o banco
-    conexao = conectar_banco()
-    # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
-    if not isinstance(conexao, str):
-        cursor = conexao.cursor()
+            # Cria a tabela se ela não existir (precaução)
+            cursor.execute(
+                "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
+            )
+            # Insere os valores formatados na tabela
+            cursor.execute(
+                "INSERT INTO notas (valor, cnpj, data) VALUES (%s, %s, %s)",
+                (
+                    float(
+                        campos_formatado["Valor"].split("$")[1]
+                    ),  # Extrai somente o valor formatado como float (exclui o R$)
+                    campos_formatado["CNPJ"],
+                    campos_formatado["Data"],
+                ),
+            )
 
-        # Cria a tabela se ela não existir (precaução)
-        cursor.execute(
-            "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
-        )
-        # Insere os valores formatados na tabela
-        cursor.execute(
-            "INSERT INTO notas (valor, cnpj, data) VALUES (%s, %s, %s)",
-            (
-                float(
-                    campos_formatado["Valor"].split("$")[1]
-                ),  # Extrai somente o valor formatado como float (exclui o R$)
-                campos_formatado["CNPJ"],
-                campos_formatado["Data"],
-            ),
-        )
+            conexao.commit()
 
-        conexao.commit()
+            cursor.close()
+            conexao.close()
 
-        cursor.close()
-        conexao.close()
-
-        return valor_retorno
-    else:
-        return {"Erro": conexao}
+            return valor_retorno
+        else:
+            return JSONResponse(status_code=500, content={"Erro": conexao})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"Erro": str(e)})
 
 
 @app.delete("/notas/")
 def deletar_nota(id: int):
+    """
+    Função que tem o objetivo de deletar uma linha da tabela "notas"
+
+    Parâmetros:
+        id (int): id da linha a ser deletada
+    """
     # Tenta se conectar com o banco
     with conectar_banco() as conexao:
         # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
@@ -203,17 +217,18 @@ def deletar_nota(id: int):
                     "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
                 )
 
-                try:
-                    # Deleta a linha da tabela onde o id bate com o parâmetro passado
-                    cursor.execute("DELETE FROM notas WHERE id = (%s)", (id,))
+                # Deleta a linha da tabela onde o id bate com o parâmetro passado
+                cursor.execute("DELETE FROM notas WHERE id = (%s)", (id,))
 
-                    conexao.commit()
+                conexao.commit()
 
-                    if cursor.rowcount:
-                        return {"Sucesso": f"Linha com id: {id} deletada com sucesso!"}
-                    else:
-                        return {"Erro": f"Linha com id: {id} não existe."}
-                except Exception as e:
-                    return {"Erro": str(e)}
+                # Verifica se alguma linha foi alterada. Caso não, o id passado não existe na tabela
+                if cursor.rowcount:
+                    return {"Sucesso": f"Linha com id: {id} deletada com sucesso!"}
+                else:
+                    return JSONResponse(
+                        status_code=404,
+                        content={"Erro": f"Linha com id: {id} não existe."},
+                    )
         else:
-            return {"Erro": conexao}
+            return JSONResponse(status_code=500, content={"Erro": conexao})
