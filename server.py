@@ -39,7 +39,7 @@ def conectar_banco():
 
 
 @app.get("/")
-def get_notas():
+def retorna_notas():
     """
     Retorna todos os dados de nota fiscal do banco de dados postgres
     """
@@ -63,7 +63,19 @@ def get_notas():
         cursor.close()
         conexao.close()
 
-        return resultado
+        json_retorno = {"payload": []}
+
+        for dados in resultado:
+            json_retorno["payload"].append(
+                {
+                    "Index": dados[0],
+                    "Valor": dados[1],
+                    "CNPJ": dados[2],
+                    "Data": dados[3],
+                }
+            )
+
+        return json_retorno
     else:
         # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
         return {"Erro": conexao}
@@ -93,7 +105,7 @@ async def processar_documento(arquivo: UploadFile = File(...)):
     # Monta o cabecalho da requisição, passando a chave da API
     headers = {"Content-Type": "application/json", "X-goog-api-key": CHAVE_API_GEMINI}
 
-    # Monta o payload para o gemini
+    # Monta o payload para o Gemini
     payload = {
         "contents": [
             {
