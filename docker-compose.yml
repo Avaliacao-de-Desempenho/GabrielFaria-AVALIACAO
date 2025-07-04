@@ -3,8 +3,8 @@ version: '3.9'
 services:
   api:
     build:
-      context: .
-      dockerfile: api/api.Dockerfile
+      context: ./api
+      dockerfile: api.Dockerfile
     container_name: fastapi_api
     ports:
       - "8000:8000"
@@ -30,6 +30,16 @@ services:
       - "5432:5432"
     env_file:
       - .env
+
+  front:
+    build:
+      context: ./front/analizador-nf
+      dockerfile: front.Dockerfile
+    container_name: react_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
 
 volumes:
   postgres_data:
