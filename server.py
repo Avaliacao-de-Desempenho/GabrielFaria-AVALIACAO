@@ -44,44 +44,41 @@ def retorna_notas():
     Retorna todos os dados de nota fiscal do banco de dados postgres
     """
     # Tenta se conectar com o banco
-    conexao = conectar_banco()
-    # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
-    if not isinstance(conexao, str):
-        cursor = conexao.cursor()
+    with conectar_banco() as conexao:
+        # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
+        if not isinstance(conexao, str):
+            with conexao.cursor() as cursor:
 
-        # Cria a tabela caso ela não exista (precaução)
-        cursor.execute(
-            "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
-        )
+                # Cria a tabela caso ela não exista (precaução)
+                cursor.execute(
+                    "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
+                )
 
-        # Retorna todos os dados da tabela "notas"
-        cursor.execute("SELECT * FROM notas")
-        resultado = cursor.fetchall()
+                # Retorna todos os dados da tabela "notas"
+                cursor.execute("SELECT * FROM notas")
+                resultado = cursor.fetchall()
 
-        conexao.commit()
+                conexao.commit()
 
-        cursor.close()
-        conexao.close()
+                json_retorno = {"payload": []}
 
-        json_retorno = {"payload": []}
+                for dados in resultado:
+                    json_retorno["payload"].append(
+                        {
+                            "Index": dados[0],
+                            "Valor": dados[1],
+                            "CNPJ": dados[2],
+                            "Data": dados[3],
+                        }
+                    )
 
-        for dados in resultado:
-            json_retorno["payload"].append(
-                {
-                    "Index": dados[0],
-                    "Valor": dados[1],
-                    "CNPJ": dados[2],
-                    "Data": dados[3],
-                }
-            )
-
-        return json_retorno
-    else:
-        # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
-        return {"Erro": conexao}
+                return json_retorno
+        else:
+            # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
+            return {"Erro": conexao}
 
 
-@app.post("/docs/")
+@app.post("/notas/")
 async def processar_documento(arquivo: UploadFile = File(...)):
     """
     Função destinada para envio de arquivo / processamento via Gemini da mesma
@@ -192,3 +189,31 @@ async def processar_documento(arquivo: UploadFile = File(...)):
         return valor_retorno
     else:
         return {"Erro": conexao}
+
+
+@app.delete("/notas/")
+def deletar_nota(id: int):
+    # Tenta se conectar com o banco
+    with conectar_banco() as conexao:
+        # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
+        if not isinstance(conexao, str):
+            with conexao.cursor() as cursor:
+                # Cria a tabela caso ela não exista (precaução)
+                cursor.execute(
+                    "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
+                )
+
+                try:
+                    # Deleta a linha da tabela onde o id bate com o parâmetro passado
+                    cursor.execute("DELETE FROM notas WHERE id = (%s)", (id,))
+
+                    conexao.commit()
+
+                    if cursor.rowcount:
+                        return {"Sucesso": f"Linha com id: {id} deletada com sucesso!"}
+                    else:
+                        return {"Erro": f"Linha com id: {id} não existe."}
+                except Exception as e:
+                    return {"Erro": str(e)}
+        else:
+            return {"Erro": conexao}
