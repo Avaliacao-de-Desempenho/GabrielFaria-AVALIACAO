@@ -5,8 +5,8 @@ import os
 import psycopg
 import requests
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 # Instancia uma aplicação FastAPI
 app = FastAPI(
@@ -18,7 +18,7 @@ app = FastAPI(
 # Adiciona CORS para o front conseguir acessar a API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,11 +53,11 @@ def retorna_notas():
     Retorna todos os dados de nota fiscal do banco de dados postgres
     """
     # Tenta se conectar com o banco
-    with conectar_banco() as conexao:
-        # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
-        if not isinstance(conexao, str):
+    conexao = conectar_banco()
+    # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
+    if not isinstance(conexao, str):
+        with conexao:
             with conexao.cursor() as cursor:
-
                 # Cria a tabela caso ela não exista (precaução)
                 cursor.execute(
                     "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
@@ -82,9 +82,9 @@ def retorna_notas():
                     )
 
                 return json_retorno
-        else:
-            # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
-            return JSONResponse(status_code=500, content={"Erro": conexao})
+    else:
+        # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
+        return JSONResponse(status_code=500, content={"Erro": conexao})
 
 
 @app.post("/notas/")
@@ -178,30 +178,27 @@ async def processar_documento(arquivo: UploadFile = File(...)):
         conexao = conectar_banco()
         # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
         if not isinstance(conexao, str):
-            cursor = conexao.cursor()
+            with conexao:
+                with conexao.cursor() as cursor:
+                    # Cria a tabela se ela não existir (precaução)
+                    cursor.execute(
+                        "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
+                    )
+                    # Insere os valores formatados na tabela
+                    cursor.execute(
+                        "INSERT INTO notas (valor, cnpj, data) VALUES (%s, %s, %s)",
+                        (
+                            float(
+                                campos_formatado["Valor"].split("$")[1]
+                            ),  # Extrai somente o valor formatado como float (exclui o R$)
+                            campos_formatado["CNPJ"],
+                            campos_formatado["Data"],
+                        ),
+                    )
 
-            # Cria a tabela se ela não existir (precaução)
-            cursor.execute(
-                "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
-            )
-            # Insere os valores formatados na tabela
-            cursor.execute(
-                "INSERT INTO notas (valor, cnpj, data) VALUES (%s, %s, %s)",
-                (
-                    float(
-                        campos_formatado["Valor"].split("$")[1]
-                    ),  # Extrai somente o valor formatado como float (exclui o R$)
-                    campos_formatado["CNPJ"],
-                    campos_formatado["Data"],
-                ),
-            )
+                    conexao.commit()
 
-            conexao.commit()
-
-            cursor.close()
-            conexao.close()
-
-            return valor_retorno
+                    return valor_retorno
         else:
             return JSONResponse(status_code=500, content={"Erro": conexao})
     except Exception as e:
@@ -217,9 +214,10 @@ def deletar_nota(id: int):
         id (int): id da linha a ser deletada
     """
     # Tenta se conectar com o banco
-    with conectar_banco() as conexao:
-        # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
-        if not isinstance(conexao, str):
+    conexao = conectar_banco()
+    # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
+    if not isinstance(conexao, str):
+        with conexao:
             with conexao.cursor() as cursor:
                 # Cria a tabela caso ela não exista (precaução)
                 cursor.execute(
@@ -239,5 +237,5 @@ def deletar_nota(id: int):
                         status_code=404,
                         content={"Erro": f"Linha com id: {id} não existe."},
                     )
-        else:
-            return JSONResponse(status_code=500, content={"Erro": conexao})
+    else:
+        return JSONResponse(status_code=500, content={"Erro": conexao})

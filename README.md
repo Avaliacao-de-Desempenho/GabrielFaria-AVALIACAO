@@ -133,6 +133,8 @@ O ambiente local deve estar num ambiente virtual, criado com o "venv", e os paco
     - https://stackoverflow.com/questions/26496388/how-to-connect-python-to-postgresql
 - Gemini
     - https://aistudio.google.com/apikey
+- Frontend
+    - https://v3.tailwindcss.com/docs/guides/create-react-app
 
 ## Passo a Passo do Projeto
 1. Fazer o setup do ambiente
