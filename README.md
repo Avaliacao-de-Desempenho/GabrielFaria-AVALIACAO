@@ -53,15 +53,33 @@
 - **Respostas das Questões**
     - \<RESPOSTAS\>
 
-## SEMANA 2: \<NOME DO PROJETO\>
-### Objetivo: \<OBJETIVO DA SEMANA\>
+## SEMANA 2: Analizador de documentos via IA
+### Objetivo: Refatorar aplicação para subir no GCP
 **07/07 - 11/07**
 - **Backlog Semanal**
-    - \<QUEBRAR O OBJETIVO DA SEMANA EM PARTES MENORES\>
+    - Estudar e definir serviços a serem utilizados para hospedar a API / banco de dados ✅
+    - Refatorar função `server.py` em funções separadas para cada tipo de requisição ✅
+    - Fazer funções separadas rodarem no `Cloud Run Functions` ✅
+    - Instanciar banco de dados `postgres` no `Cloud SQL` ✅
+    - Comunicar funções `Cloud Run Functions` com banco de dados no `Cloud SQL` ✅
+    - Instanciar API no `API Gateway` ✅
+    - Linkar rotas da API com as novas funções ✅
+    - Estudar e definir serviços com o fito de hospedar o frontend da aplicação
+    - Refatorar o front para compatibilidade com o `GCP` (se necessário)
+    - Integrar front no `GCP` com a API no `API Gateway`
+    - Documentar arquitetura (Desenhar diagrama)
 
 - **Resultado Esperado**
-    - \<QUAL ENTREGÁVEL SERÁ PRODUZIDO QUANDO O OBJETIVO FOR ALCANÇADO (FINAL DA SEMANA)\>
-    - Evolução: \<0% - 100%\>
+    - A aplicação (API previamente desenvolvida) rodando numa arquitetura otimizada utilizando serviços do Google Cloud Platform (`GCP`).
+      - **07/07**:
+        - Defini a arquitetura a ser utilizada pra hospedar o back-end no `GCP`, consistindo do fluxo:
+          - `Usuário -> API Gateway -> Cloud Run Functions -> Cloud SQL`
+        - Refatorei a API (previamente rodando com `Fast API`) para puramente consultar o banco e retornar os valores, ou seja, retirando a necessidade e a dependência do `Fast API`
+        - Instanciei um banco de dados `Postgres` no `Cloud SQL`
+        - Integrei as minhas funções com o novo banco
+        - Instanciei uma nova API no serviço `API Gateway` (onde o usuário vai acessar a URL pública)
+        - Defini o arquivo `yaml` de configuração da API, linkando os métodos e rotas com as funções que desenvolvi previamente no `Cloud Run Functions`.
+    - Evolução: 60%
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
     - \<DÚVIDAS\>
