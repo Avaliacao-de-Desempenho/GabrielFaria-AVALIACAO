@@ -90,7 +90,7 @@ def retorna_notas():
 @app.post("/notas/")
 async def processar_documento(arquivo: UploadFile = File(...)):
     """
-    Função destinada para envio de arquivo / processamento via Gemini da mesma
+    Função destinada para envio de arquivo / processamento via Gemini dos mesmos
 
     Parâmetros:
         arquivo (UploadFile): Imagem da nota fiscal enviada via API.

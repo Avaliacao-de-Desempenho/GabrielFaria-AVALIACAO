@@ -18,3 +18,26 @@ paths:
       x-google-backend:
         address: https://get-avaliacao-314988402732.europe-west1.run.app
         protocol: h2
+  "/notas":
+    post:
+      description: "Função destinada para envio de arquivo / processamento via Gemini dos mesmos"
+      operationId: "post"
+      responses:
+        200:
+          description: "Success."
+          schema:
+            type: string
+      x-google-backend:
+        address: https://post-avaliacao-314988402732.europe-west1.run.app
+        protocol: h2
+    delete:
+      description: "Função que tem o objetivo de deletar uma linha da tabela notas"
+      operationId: "delete"
+      responses:
+        200:
+          description: "Success."
+          schema:
+            type: string
+      x-google-backend:
+        address: https://delete-avaliacao-314988402732.europe-west1.run.app
+        protocol: h2
