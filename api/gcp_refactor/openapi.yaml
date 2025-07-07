@@ -1,0 +1,20 @@
+swagger: "2.0"
+info:
+  title: api-avaliacao
+  description: "API desenvolvida utilizando FastAPI que integra a API do Gemini para recuperar campos de notas fiscais."
+  version: "1.0.0"
+schemes:
+  - "https"
+paths:
+  "/":
+    get:
+      description: "Retorna todos os dados de nota fiscal do banco de dados postgres"
+      operationId: "get"
+      responses:
+        200:
+          description: "Success."
+          schema:
+            type: string
+      x-google-backend:
+        address: https://get-avaliacao-314988402732.europe-west1.run.app
+        protocol: h2
