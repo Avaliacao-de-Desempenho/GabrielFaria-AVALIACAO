@@ -73,12 +73,16 @@
     - A aplicação (API previamente desenvolvida) rodando numa arquitetura otimizada utilizando serviços do Google Cloud Platform (`GCP`).
       - **07/07**:
         - Defini a arquitetura a ser utilizada pra hospedar o back-end no `GCP`, consistindo do fluxo:
-          - `Usuário -> API Gateway -> Cloud Run Functions -> Cloud SQL`
+          - `Usuário <-> API Gateway <-> Cloud Run Functions <-> Cloud SQL`
         - Refatorei a API (previamente rodando com `Fast API`) para puramente consultar o banco e retornar os valores, ou seja, retirando a necessidade e a dependência do `Fast API`
         - Instanciei um banco de dados `Postgres` no `Cloud SQL`
+          - ![cloudsql](./docs/imgs/postgres_cloudsql.png)
         - Integrei as minhas funções com o novo banco
+          - ![consql](./docs/imgs/con_sql.png)
+          - ![env](./docs/imgs/env.png)
         - Instanciei uma nova API no serviço `API Gateway` (onde o usuário vai acessar a URL pública)
         - Defini o arquivo `yaml` de configuração da API, linkando os métodos e rotas com as funções que desenvolvi previamente no `Cloud Run Functions`.
+        - ![api](./docs/imgs/api.png)
     - Evolução: 60%
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
