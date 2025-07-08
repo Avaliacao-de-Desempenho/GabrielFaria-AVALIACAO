@@ -1,26 +1,41 @@
 import React from "react"
+import { NavLink } from "react-router-dom"
 
-interface NavbarProps {
-  activeTab: string
-  onTabChange: (tab: string) => void
-}
-
-const Navbar: React.FC<NavbarProps> = ({ activeTab, onTabChange }) => {
-  const tabs = ["ver", "enviar", "deletar"]
-
+const Navbar = () => {
   return (
     <nav className="bg-blue-600 text-white p-4 flex justify-center gap-4 rounded-b-xl">
-      {tabs.map((tab) => (
-        <button
-          key={tab}
-          onClick={() => onTabChange(tab)}
-          className={`capitalize px-4 py-2 rounded-lg ${
-            activeTab === tab ? "bg-white text-blue-600 font-bold" : "hover:bg-blue-500"
-          }`}
-        >
-          {tab === "ver" ? "Ver Notas" : tab === "enviar" ? "Enviar Nota" : "Deletar Nota"}
-        </button>
-      ))}
+      <NavLink
+        to="/"
+        className={({ isActive }) =>
+          `px-4 py-2 rounded-lg capitalize ${
+            isActive ? "bg-white text-blue-600 font-bold" : "hover:bg-blue-500"
+          }`
+        }
+      >
+        Ver Notas
+      </NavLink>
+
+      <NavLink
+        to="/enviar"
+        className={({ isActive }) =>
+          `px-4 py-2 rounded-lg capitalize ${
+            isActive ? "bg-white text-blue-600 font-bold" : "hover:bg-blue-500"
+          }`
+        }
+      >
+        Enviar Nota
+      </NavLink>
+
+      <NavLink
+        to="/deletar"
+        className={({ isActive }) =>
+          `px-4 py-2 rounded-lg capitalize ${
+            isActive ? "bg-white text-blue-600 font-bold" : "hover:bg-blue-500"
+          }`
+        }
+      >
+        Deletar Nota
+      </NavLink>
     </nav>
   )
 }

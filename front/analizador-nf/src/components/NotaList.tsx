@@ -8,7 +8,7 @@ interface Nota {
   Data: string
 }
 
-const NotasList = () => {
+const ListarNotas = () => {
   const [notas, setNotas] = useState<Nota[]>([])
   const [erro, setErro] = useState<string | null>(null)
 
@@ -43,4 +43,4 @@ const NotasList = () => {
   )
 }
 
-export default NotasList
+export default ListarNotas
