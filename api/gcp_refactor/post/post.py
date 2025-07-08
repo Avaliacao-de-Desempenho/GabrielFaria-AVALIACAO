@@ -40,14 +40,17 @@ def post(request):
             "Data": "YYYY/MM/DD"
         }
     """
-    request_json = request.get_json(silent=True)
-    request_args = request.args
 
     if "arquivo" not in request.files:
         return (
             json.dumps({"erro": "Arquivo não enviado na requisição."}),
             400,
-            {"Content-Type": "application/json"},
+            {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            },
         )
 
     arquivo = request.files["arquivo"]
@@ -104,10 +107,15 @@ def post(request):
         if resposta.status_code != 200:
             return (
                 json.dumps(
-                    {"erro": "Erro ao processar imagem no Gemini:" + resposta.text}
+                    {"erro": "Erro ao processar imagem no Gemini: " + resposta.text}
                 ),
                 500,
-                {"Content-Type": "application/json"},
+                {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "*",
+                },
             )
 
         # Retorna resultado do gemini
@@ -150,17 +158,36 @@ def post(request):
 
                     conexao.commit()
 
-                    return valor_retorno
+                    return (
+                        json.dumps(valor_retorno),
+                        200,
+                        {
+                            "Content-Type": "application/json",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "POST, OPTIONS",
+                            "Access-Control-Allow-Headers": "*",
+                        },
+                    )
         else:
             # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
             return (
                 json.dumps({"erro": conexao}),
                 500,
-                {"Content-Type": "application/json"},
+                {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "*",
+                },
             )
     except Exception as e:
         return (
             json.dumps({"erro": str(e)}),
             500,
-            {"Content-Type": "application/json"},
+            {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            },
         )

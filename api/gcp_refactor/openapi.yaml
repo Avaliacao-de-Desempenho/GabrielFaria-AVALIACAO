@@ -18,6 +18,12 @@ paths:
       x-google-backend:
         address: https://get-avaliacao-314988402732.europe-west1.run.app
         protocol: h2
+      x-google-extensions:
+        cors:
+          allowOrigins: ["*"]
+          allowMethods: ["GET", "OPTIONS"]
+          allowHeaders: ["*"]
+
   "/notas":
     post:
       description: "Função destinada para envio de arquivo / processamento via Gemini dos mesmos"
@@ -30,6 +36,12 @@ paths:
       x-google-backend:
         address: https://post-avaliacao-314988402732.europe-west1.run.app
         protocol: h2
+      x-google-extensions:
+        cors:
+          allowOrigins: ["*"]
+          allowMethods: ["POST", "OPTIONS"]
+          allowHeaders: ["*"]
+
     delete:
       description: "Função que tem o objetivo de deletar uma linha da tabela notas"
       operationId: "delete"
@@ -41,3 +53,23 @@ paths:
       x-google-backend:
         address: https://delete-avaliacao-314988402732.europe-west1.run.app
         protocol: h2
+      x-google-extensions:
+        cors:
+          allowOrigins: ["*"]
+          allowMethods: ["DELETE", "OPTIONS"]
+          allowHeaders: ["*"]
+
+    options:
+      operationId: "options"
+      description: "Preflight CORS para /notas"
+      responses:
+        204:
+          description: "CORS preflight success."
+      x-google-backend:
+        address: https://delete-avaliacao-314988402732.europe-west1.run.app
+        protocol: h2
+      x-google-extensions:
+        cors:
+          allowOrigins: ["*"]
+          allowMethods: ["DELETE", "OPTIONS"]
+          allowHeaders: ["*"]

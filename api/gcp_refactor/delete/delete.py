@@ -1,7 +1,9 @@
-import functions_framework
-import os
-import psycopg
 import json
+import os
+
+import functions_framework
+import psycopg
+
 
 def conectar_banco():
     """
@@ -19,6 +21,7 @@ def conectar_banco():
     except Exception as e:
         return str(e)
 
+
 @functions_framework.http
 def delete(request):
     """
@@ -28,13 +31,26 @@ def delete(request):
         id (int): id da linha a ser deletada
     """
 
+    # Trata requisição do método OPTIONS, comum acontecer antes de rodar o DELETE
+    if request.method == "OPTIONS":
+        return (
+            "",
+            204,
+            {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+                "Content-Type": "application/json",
+            },
+        )
+
     request_json = request.get_json(silent=True)
     request_args = request.args
 
-    if request_json and 'id' in request_json:
-        id = request_json['id']
-    elif request_args and 'id' in request_args:
-        id = request_args['id']
+    if request_json and "id" in request_json:
+        id = request_json["id"]
+    elif request_args and "id" in request_args:
+        id = request_args["id"]
     else:
         id = 1
 
@@ -56,17 +72,38 @@ def delete(request):
 
                 # Verifica se alguma linha foi alterada. Caso não, o id passado não existe na tabela
                 if cursor.rowcount:
-                    return {"Sucesso": f"Linha com id: {id} deletada com sucesso!"}
+                    return (
+                        json.dumps(
+                            {"Sucesso": f"Linha com id: {id} deletada com sucesso!"}
+                        ),
+                        200,
+                        {
+                            "Content-Type": "application/json",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "DELETE, OPTIONS",
+                            "Access-Control-Allow-Headers": "*",
+                        },
+                    )
                 else:
-                    return json.dumps(
-                        {"Erro": f"Linha com id: {id} não existe."},
+                    return (
+                        json.dumps({"Erro": f"Linha com id: {id} não existe."}),
                         404,
-                        {"Content-Type": "application/json"},
+                        {
+                            "Content-Type": "application/json",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "DELETE, OPTIONS",
+                            "Access-Control-Allow-Headers": "*",
+                        },
                     )
     else:
         # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
         return (
             json.dumps({"erro": conexao}),
             500,
-            {"Content-Type": "application/json"},
+            {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "DELETE, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            },
         )

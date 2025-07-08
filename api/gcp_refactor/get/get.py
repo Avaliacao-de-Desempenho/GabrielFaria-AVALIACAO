@@ -52,15 +52,29 @@ def get(request):
                             "Index": dados[0],
                             "Valor": dados[1],
                             "CNPJ": dados[2],
-                            "Data": dados[3],
+                            "Data": dados[3].isoformat(),
                         }
                     )
 
-                return json_retorno
+                return (
+                    json.dumps(json_retorno),
+                    200,
+                    {
+                        "Content-Type": "application/json",
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Methods": "GET, OPTIONS",
+                        "Access-Control-Allow-Headers": "*",
+                    },
+                )
     else:
         # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
         return (
             json.dumps({"erro": conexao}),
             500,
-            {"Content-Type": "application/json"},
+            {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            },
         )
