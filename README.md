@@ -64,6 +64,7 @@
     - Comunicar funções `Cloud Run Functions` com banco de dados no `Cloud SQL` ✅
     - Instanciar API no `API Gateway` ✅
     - Linkar rotas da API com as novas funções ✅
+    - Aprimorar front (implementar `GET` e `DELETE` além do `POST`)
     - Estudar e definir serviços com o fito de hospedar o frontend da aplicação
     - Refatorar o front para compatibilidade com o `GCP` (se necessário)
     - Integrar front no `GCP` com a API no `API Gateway`
@@ -76,13 +77,13 @@
           - `Usuário <-> API Gateway <-> Cloud Run Functions <-> Cloud SQL`
         - Refatorei a API (previamente rodando com `Fast API`) para puramente consultar o banco e retornar os valores, ou seja, retirando a necessidade e a dependência do `Fast API`
         - Instanciei um banco de dados `Postgres` no `Cloud SQL`
-          - ![cloudsql](./docs/imgs/postgres_cloudsql.png)
+            ![cloudsql](./docs/imgs/postgres_cloudsql.png)
         - Integrei as minhas funções com o novo banco
-          - ![consql](./docs/imgs/con_sql.png)
-          - ![env](./docs/imgs/env.png)
+            ![consql](./docs/imgs/con_sql.png)
+            ![env](./docs/imgs/env.png)
         - Instanciei uma nova API no serviço `API Gateway` (onde o usuário vai acessar a URL pública)
         - Defini o arquivo `yaml` de configuração da API, linkando os métodos e rotas com as funções que desenvolvi previamente no `Cloud Run Functions`.
-        - ![api](./docs/imgs/api.png)
+            ![api](./docs/imgs/api.png)
     - Evolução: 60%
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
