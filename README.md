@@ -84,7 +84,22 @@
         - Instanciei uma nova API no serviço `API Gateway` (onde o usuário vai acessar a URL pública)
         - Defini o arquivo `yaml` de configuração da API, linkando os métodos e rotas com as funções que desenvolvi previamente no `Cloud Run Functions`.
             ![api](./docs/imgs/api.png)
-    - Evolução: 60%
+      - Evolução: 60%
+
+    - **08/07**:
+      - De início, modifiquei o frontend para ter uma navbar superior e conseguir navegar entre as páginas de:
+        - Visualização de notas;
+        - Envio de notas para processamento (já tinha);
+        - Excluir linhas da tabela.
+      - Em seguida desenvolvi as telas de visualização e excluir, integrando elas com, respectivamente, os métodois `GET` e `DELETE` que já tinham sido desenvolvidos na API
+      - Depois, estudando diferentes serviços para fazer a implementação do front no `GCP` defini o `Cloud Run` para o rodar a imagem `Docker` que já tinha desenvolvido
+      - Pra isso, estudei como fazia uma implementação `CI/CD` com o GitHub, onde cada vez que eu faço um commit, o GitHub automaticamente builda a imagem, sobe num repositório de imagens do `GCP` (`Artifact Registry`) e atualiza o container rodando no `Cloud Run` com a versão mais atualizada da imagem!!
+        - Criei o repositório no `Artifact Registry`
+        - Criei uma conta de serviço com permissões para acessar o `Artifact Registry` e o `Cloud Run`
+        - Resgatei as credenciais dessa conta e salvei como variáveis de ambiente no repositório do GitHub
+        - Desenvolvi o arquivo `yml` que executa os passos necessários para o deploy após cada commit
+      - Para isso, tive que configurar a API para aceitar `CORS` (requisições advindas da nova URL pública do `Cloud Run`) e o deploy `CI/CD` integrado com o `GCP` funcionou normalmente!
+      - Evolução: 100%
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
     - \<DÚVIDAS\>
