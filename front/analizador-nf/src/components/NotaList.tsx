@@ -13,6 +13,7 @@ const ListarNotas = () => {
   const [erro, setErro] = useState<string | null>(null)
 
   useEffect(() => {
+    // Função que traz os dados da API
     const fetchNotas = async () => {
       try {
         const response = await axios.get("http://localhost:8000/")
@@ -25,6 +26,7 @@ const ListarNotas = () => {
     fetchNotas()
   }, [])
 
+  // Formata cada um dos dados do payload em um componente separado no formato de lista
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">Notas Registradas</h2>

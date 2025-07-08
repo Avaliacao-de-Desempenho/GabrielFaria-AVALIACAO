@@ -6,6 +6,7 @@ const DeletarNota = () => {
   const [mensagem, setMensagem] = useState("")
   const [erro, setErro] = useState<string | null>(null)
 
+  // Função que deleta uma linha da tabela de acordo com o id passado pelo input do usuário (roda quando o botão de delete é pressionado)
   const handleDelete = async () => {
     if (!id) return
 
