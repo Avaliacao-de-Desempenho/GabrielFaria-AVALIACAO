@@ -16,7 +16,7 @@ const ListarNotas = () => {
     // Função que traz os dados da API
     const fetchNotas = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/")
+        const response = await axios.get("https://api-avaliacao-40pbyn1o.uc.gateway.dev/")
         setNotas(response.data.payload)
       } catch (err: any) {
         setErro(err?.message || "Erro ao buscar notas")

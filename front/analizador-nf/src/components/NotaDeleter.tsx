@@ -11,7 +11,7 @@ const DeletarNota = () => {
     if (!id) return
 
     try {
-      await axios.delete(`http://localhost:8000/notas/?id=${id}`)
+      await axios.delete(`https://api-avaliacao-40pbyn1o.uc.gateway.dev/notas/?id=${id}`)
       setMensagem(`Nota com ID ${id} deletada com sucesso.`)
       setErro(null)
       setId("")

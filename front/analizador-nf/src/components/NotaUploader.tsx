@@ -27,7 +27,7 @@ const NotaUploader = () => {
       setCarregando(true)
       setErro(null)
 
-      const response = await axios.post("http://localhost:8000/notas/", formData, {
+      const response = await axios.post("https://api-avaliacao-40pbyn1o.uc.gateway.dev/notas/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
