@@ -2,31 +2,9 @@ import base64
 import json
 import os
 
+import functions_framework
 import psycopg
 import requests
-from fastapi import FastAPI, File, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-
-# Instancia uma aplicação FastAPI
-app = FastAPI(
-    title="API - Analizador de notas fiscais",
-    description="API desenvolvida utilizando FastAPI que integra a API do Gemini para recuperar campos de notas fiscais.",
-    version="1.0.0",
-)
-
-# Adiciona CORS para o front conseguir acessar a API
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Recupera variáveis relativas à integração com GEMINI do .env
-CHAVE_API_GEMINI = os.environ.get("CHAVE_API_GEMINI")
-ENDPOINT_GEMINI = os.environ.get("ENDPOINT_GEMINI")
 
 
 def conectar_banco():
@@ -39,58 +17,17 @@ def conectar_banco():
             dbname=os.environ["DB_POSTGRES"],
             user=os.environ["USUARIO_POSTGRES"],
             password=os.environ["SENHA_POSTGRES"],
-            host="db",
-            port="5432",
+            host=os.environ["URL_POSTGRES"],
         )
         return conexao
     except Exception as e:
         return str(e)
 
 
-@app.get("/")
-def retorna_notas():
+@functions_framework.http
+def post(request):
     """
-    Retorna todos os dados de nota fiscal do banco de dados postgres
-    """
-    # Tenta se conectar com o banco
-    conexao = conectar_banco()
-    # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
-    if not isinstance(conexao, str):
-        with conexao:
-            with conexao.cursor() as cursor:
-                # Cria a tabela caso ela não exista (precaução)
-                cursor.execute(
-                    "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
-                )
-
-                # Retorna todos os dados da tabela "notas"
-                cursor.execute("SELECT * FROM notas")
-                resultado = cursor.fetchall()
-
-                conexao.commit()
-
-                json_retorno = {"payload": []}
-
-                for dados in resultado:
-                    json_retorno["payload"].append(
-                        {
-                            "Index": dados[0],
-                            "Valor": dados[1],
-                            "CNPJ": dados[2],
-                            "Data": dados[3],
-                        }
-                    )
-
-                return json_retorno
-    else:
-        # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
-        return JSONResponse(status_code=500, content={"Erro": conexao})
-
-
-@app.post("/notas/")
-async def processar_documento(arquivo: UploadFile = File(...)):
-    """
-    Função destinada para envio de arquivo / processamento via Gemini dos mesmos
+    Função destinada para envio de arquivo / processamento via Gemini da mesma
 
     Parâmetros:
         arquivo (UploadFile): Imagem da nota fiscal enviada via API.
@@ -103,9 +40,27 @@ async def processar_documento(arquivo: UploadFile = File(...)):
             "Data": "YYYY/MM/DD"
         }
     """
+
+    if "arquivo" not in request.files:
+        return (
+            json.dumps({"erro": "Arquivo não enviado na requisição."}),
+            400,
+            {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            },
+        )
+
+    arquivo = request.files["arquivo"]
+
+    CHAVE_API_GEMINI = os.environ.get("CHAVE_API_GEMINI")
+    ENDPOINT_GEMINI = os.environ.get("ENDPOINT_GEMINI")
+
     try:
         # Recupera o arquivo na forma de bytes
-        conteudo = await arquivo.read()
+        conteudo = arquivo.read()
         # Converte o arquivo (bytes) para base64, para enviar para o Gemini
         arquivo_base64 = base64.b64encode(conteudo).decode("utf-8")
 
@@ -150,11 +105,16 @@ async def processar_documento(arquivo: UploadFile = File(...)):
 
         # Retorna erro, caso haja algum
         if resposta.status_code != 200:
-            return JSONResponse(
-                status_code=500,
-                content={
-                    "erro": "Erro ao processar imagem no Gemini",
-                    "detalhe": resposta.text,
+            return (
+                json.dumps(
+                    {"erro": "Erro ao processar imagem no Gemini: " + resposta.text}
+                ),
+                500,
+                {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "*",
                 },
             )
 
@@ -198,44 +158,36 @@ async def processar_documento(arquivo: UploadFile = File(...)):
 
                     conexao.commit()
 
-                    return valor_retorno
-        else:
-            return JSONResponse(status_code=500, content={"Erro": conexao})
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"Erro": str(e)})
-
-
-@app.delete("/notas/")
-def deletar_nota(id: int):
-    """
-    Função que tem o objetivo de deletar uma linha da tabela "notas"
-
-    Parâmetros:
-        id (int): id da linha a ser deletada
-    """
-    # Tenta se conectar com o banco
-    conexao = conectar_banco()
-    # Caso a conexão não tenha retornado uma string, quer dizer que a conexão foi bem sucedida e assim o código corre normalmente
-    if not isinstance(conexao, str):
-        with conexao:
-            with conexao.cursor() as cursor:
-                # Cria a tabela caso ela não exista (precaução)
-                cursor.execute(
-                    "CREATE TABLE IF NOT EXISTS notas (id serial PRIMARY KEY, valor real, cnpj varchar, data date)"
-                )
-
-                # Deleta a linha da tabela onde o id bate com o parâmetro passado
-                cursor.execute("DELETE FROM notas WHERE id = (%s)", (id,))
-
-                conexao.commit()
-
-                # Verifica se alguma linha foi alterada. Caso não, o id passado não existe na tabela
-                if cursor.rowcount:
-                    return {"Sucesso": f"Linha com id: {id} deletada com sucesso!"}
-                else:
-                    return JSONResponse(
-                        status_code=404,
-                        content={"Erro": f"Linha com id: {id} não existe."},
+                    return (
+                        json.dumps(valor_retorno),
+                        200,
+                        {
+                            "Content-Type": "application/json",
+                            "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Allow-Methods": "POST, OPTIONS",
+                            "Access-Control-Allow-Headers": "*",
+                        },
                     )
-    else:
-        return JSONResponse(status_code=500, content={"Erro": conexao})
+        else:
+            # Caso a conexão retorne uma string, quer dizer que houve um erro. Exibe o erro para o usuário
+            return (
+                json.dumps({"erro": conexao}),
+                500,
+                {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "POST, OPTIONS",
+                    "Access-Control-Allow-Headers": "*",
+                },
+            )
+    except Exception as e:
+        return (
+            json.dumps({"erro": str(e)}),
+            500,
+            {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+            },
+        )

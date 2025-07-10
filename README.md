@@ -53,15 +53,57 @@
 - **Respostas das Questões**
     - \<RESPOSTAS\>
 
-## SEMANA 2: \<NOME DO PROJETO\>
-### Objetivo: \<OBJETIVO DA SEMANA\>
+## SEMANA 2: Analizador de documentos via IA
+### Objetivo: Refatorar aplicação para subir no GCP
 **07/07 - 11/07**
 - **Backlog Semanal**
-    - \<QUEBRAR O OBJETIVO DA SEMANA EM PARTES MENORES\>
+    - Estudar e definir serviços a serem utilizados para hospedar a API / banco de dados ✅
+    - Refatorar função `server.py` em funções separadas para cada tipo de requisição ✅
+    - Fazer funções separadas rodarem no `Cloud Run Functions` ✅
+    - Instanciar banco de dados `postgres` no `Cloud SQL` ✅
+    - Comunicar funções `Cloud Run Functions` com banco de dados no `Cloud SQL` ✅
+    - Instanciar API no `API Gateway` ✅
+    - Linkar rotas da API com as novas funções ✅
+    - Aprimorar front (implementar `GET` e `DELETE` além do `POST`)
+    - Estudar e definir serviços com o fito de hospedar o frontend da aplicação
+    - Refatorar o front para compatibilidade com o `GCP` (se necessário)
+    - Integrar front no `GCP` com a API no `API Gateway`
+    - Documentar arquitetura (Desenhar diagrama)
 
 - **Resultado Esperado**
-    - \<QUAL ENTREGÁVEL SERÁ PRODUZIDO QUANDO O OBJETIVO FOR ALCANÇADO (FINAL DA SEMANA)\>
-    - Evolução: \<0% - 100%\>
+    - A aplicação (API previamente desenvolvida) rodando numa arquitetura otimizada utilizando serviços do Google Cloud Platform (`GCP`).
+      - **07/07**:
+        - Defini a arquitetura a ser utilizada pra hospedar o back-end no `GCP`, consistindo do fluxo:
+          - `Usuário <-> API Gateway <-> Cloud Run Functions <-> Cloud SQL`
+        - Refatorei a API (previamente rodando com `Fast API`) para puramente consultar o banco e retornar os valores, ou seja, retirando a necessidade e a dependência do `Fast API`
+        - Instanciei um banco de dados `Postgres` no `Cloud SQL`
+            ![cloudsql](./docs/imgs/postgres_cloudsql.png)
+        - Integrei as minhas funções com o novo banco
+            ![consql](./docs/imgs/con_sql.png)
+            ![env](./docs/imgs/env.png)
+        - Instanciei uma nova API no serviço `API Gateway` (onde o usuário vai acessar a URL pública)
+        - Defini o arquivo `yaml` de configuração da API, linkando os métodos e rotas com as funções que desenvolvi previamente no `Cloud Run Functions`.
+            ![api](./docs/imgs/api.png)
+      - Evolução: 60%
+
+    - **08/07**:
+      - De início, modifiquei o frontend para ter uma navbar superior e conseguir navegar entre as páginas de:
+        - Visualização de notas;
+        - Envio de notas para processamento (já tinha);
+        - Excluir linhas da tabela.
+      - Em seguida desenvolvi as telas de visualização e excluir, integrando elas com, respectivamente, os métodos `GET` e `DELETE` que já tinham sido desenvolvidos na API
+      - Depois, estudando diferentes serviços para fazer a implementação do front no `GCP` defini o `Cloud Run` para o rodar a imagem `Docker` que já tinha desenvolvido
+      - Pra isso, estudei como fazia uma implementação `CI/CD` com o GitHub, onde cada vez que eu faço um commit, o GitHub automaticamente builda a imagem, sobe num repositório de imagens do `GCP` (`Artifact Registry`) e atualiza o container rodando no `Cloud Run` com a versão mais atualizada da imagem!!
+        - Criei o repositório no `Artifact Registry`
+            ![artifact](./docs/imgs/artifact.png) 
+        - Criei uma conta de serviço com permissões para acessar o `Artifact Registry` e o `Cloud Run`
+            ![service](./docs/imgs/service.png) 
+        - Resgatei as credenciais dessa conta e salvei como variáveis de ambiente no repositório do GitHub
+        - Desenvolvi o arquivo `yml` que executa os passos necessários para o deploy após cada commit
+      - Para isso, tive que configurar a API para aceitar `CORS` (requisições advindas da nova URL pública do `Cloud Run`) e o deploy `CI/CD` integrado com o `GCP` funcionou normalmente!
+      - Evolução: 100%
+
+    ![arquitetura](./docs/imgs/arquitetura.png) 
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
     - \<DÚVIDAS\>

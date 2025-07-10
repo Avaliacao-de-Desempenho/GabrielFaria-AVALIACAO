@@ -13,17 +13,21 @@ const NotaUploader = () => {
   const [carregando, setCarregando] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
 
+  // Função que envia uma nota fiscal para processamento (roda quando o botão de enviar é pressionado)
   const handleUpload = async () => {
     if (!arquivo) return
 
+    // Utilizado pra enviar o arquivo como "multipart/form-data", serve como um dicionário
     const formData = new FormData()
+    // Adiciona a chave "arquivo" (nome do parâmetro na API) com o valor arquivo passado pelo usuário
     formData.append("arquivo", arquivo)
 
+    // Faz a requisição pra API
     try {
       setCarregando(true)
       setErro(null)
 
-      const response = await axios.post("http://localhost:8000/notas/", formData, {
+      const response = await axios.post("https://api-avaliacao-40pbyn1o.uc.gateway.dev/notas/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
