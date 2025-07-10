@@ -64,11 +64,11 @@
     - Comunicar funções `Cloud Run Functions` com banco de dados no `Cloud SQL` ✅
     - Instanciar API no `API Gateway` ✅
     - Linkar rotas da API com as novas funções ✅
-    - Aprimorar front (implementar `GET` e `DELETE` além do `POST`)
-    - Estudar e definir serviços com o fito de hospedar o frontend da aplicação
-    - Refatorar o front para compatibilidade com o `GCP` (se necessário)
-    - Integrar front no `GCP` com a API no `API Gateway`
-    - Documentar arquitetura (Desenhar diagrama)
+    - Aprimorar front (implementar `GET` e `DELETE` além do `POST`) ✅
+    - Estudar e definir serviços com o fito de hospedar o frontend da aplicação ✅
+    - Refatorar o front para compatibilidade com o `GCP` (se necessário) ✅
+    - Integrar front no `GCP` com a API no `API Gateway` ✅
+    - Documentar arquitetura (Desenhar diagrama) ✅
 
 - **Resultado Esperado**
     - A aplicação (API previamente desenvolvida) rodando numa arquitetura otimizada utilizando serviços do Google Cloud Platform (`GCP`).
