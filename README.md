@@ -91,15 +91,19 @@
         - Visualização de notas;
         - Envio de notas para processamento (já tinha);
         - Excluir linhas da tabela.
-      - Em seguida desenvolvi as telas de visualização e excluir, integrando elas com, respectivamente, os métodois `GET` e `DELETE` que já tinham sido desenvolvidos na API
+      - Em seguida desenvolvi as telas de visualização e excluir, integrando elas com, respectivamente, os métodos `GET` e `DELETE` que já tinham sido desenvolvidos na API
       - Depois, estudando diferentes serviços para fazer a implementação do front no `GCP` defini o `Cloud Run` para o rodar a imagem `Docker` que já tinha desenvolvido
       - Pra isso, estudei como fazia uma implementação `CI/CD` com o GitHub, onde cada vez que eu faço um commit, o GitHub automaticamente builda a imagem, sobe num repositório de imagens do `GCP` (`Artifact Registry`) e atualiza o container rodando no `Cloud Run` com a versão mais atualizada da imagem!!
         - Criei o repositório no `Artifact Registry`
+            ![artifact](./docs/imgs/artifact.png) 
         - Criei uma conta de serviço com permissões para acessar o `Artifact Registry` e o `Cloud Run`
+            ![service](./docs/imgs/service.png) 
         - Resgatei as credenciais dessa conta e salvei como variáveis de ambiente no repositório do GitHub
         - Desenvolvi o arquivo `yml` que executa os passos necessários para o deploy após cada commit
       - Para isso, tive que configurar a API para aceitar `CORS` (requisições advindas da nova URL pública do `Cloud Run`) e o deploy `CI/CD` integrado com o `GCP` funcionou normalmente!
       - Evolução: 100%
+
+    ![arquitetura](./docs/imgs/arquitetura.png) 
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
     - \<DÚVIDAS\>
