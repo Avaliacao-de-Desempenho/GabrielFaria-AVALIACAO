@@ -41,5 +41,22 @@ services:
     depends_on:
       - api
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${USUARIO_PGADMIN}
+      PGADMIN_DEFAULT_PASSWORD: ${SENHA_PGADMIN}
+    ports:
+      - "5050:80"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
 volumes:
   postgres_data:
+  pgadmin_data:
