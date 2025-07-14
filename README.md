@@ -103,6 +103,12 @@
       - Para isso, tive que configurar a API para aceitar `CORS` (requisições advindas da nova URL pública do `Cloud Run`) e o deploy `CI/CD` integrado com o `GCP` funcionou normalmente!
       - Evolução: 100%
 
+    - **10/07**:
+      - Estudei o padrão de diagramas de arquiteturas GCP
+      - Desenhei o diagrama da arquitetura serverless que estou utilizando para a análise de images
+      - Aprimorei o front-end, adicionando um placeholder de loading enquanto o front faz a requisição para a API
+      - Evolução: 100%
+
     ![arquitetura](./docs/imgs/arquitetura.png) 
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
