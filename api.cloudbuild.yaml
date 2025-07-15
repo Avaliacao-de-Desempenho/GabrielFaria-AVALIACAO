@@ -2,6 +2,7 @@ steps:
   # --- Deploy GET ---
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy get-avaliacao'
+    entrypoint: gcloud
     args:
       [
         'functions', 'deploy', 'get-avaliacao',
@@ -17,6 +18,7 @@ steps:
   # --- Deploy POST ---
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy post-avaliacao'
+    entrypoint: gcloud
     args:
       [
         'functions', 'deploy', 'post-avaliacao',
@@ -32,6 +34,7 @@ steps:
   # --- Deploy DELETE ---
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'Deploy delete-avaliacao'
+    entrypoint: gcloud
     args:
       [
         'functions', 'deploy', 'delete-avaliacao',
