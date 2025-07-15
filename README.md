@@ -86,27 +86,27 @@
             ![api](./docs/imgs/api.png)
       - Evolução: 60%
 
-    - **08/07**:
-      - De início, modifiquei o frontend para ter uma navbar superior e conseguir navegar entre as páginas de:
-        - Visualização de notas;
-        - Envio de notas para processamento (já tinha);
-        - Excluir linhas da tabela.
-      - Em seguida desenvolvi as telas de visualização e excluir, integrando elas com, respectivamente, os métodos `GET` e `DELETE` que já tinham sido desenvolvidos na API
-      - Depois, estudando diferentes serviços para fazer a implementação do front no `GCP` defini o `Cloud Run` para o rodar a imagem `Docker` que já tinha desenvolvido
-      - Pra isso, estudei como fazia uma implementação `CI/CD` com o GitHub, onde cada vez que eu faço um commit, o GitHub automaticamente builda a imagem, sobe num repositório de imagens do `GCP` (`Artifact Registry`) e atualiza o container rodando no `Cloud Run` com a versão mais atualizada da imagem!!
-        - Criei o repositório no `Artifact Registry`
-            ![artifact](./docs/imgs/artifact.png) 
-        - Criei uma conta de serviço com permissões para acessar o `Artifact Registry` e o `Cloud Run`
-            ![service](./docs/imgs/service.png) 
-        - Resgatei as credenciais dessa conta e salvei como variáveis de ambiente no repositório do GitHub
-        - Desenvolvi o arquivo `yml` que executa os passos necessários para o deploy após cada commit
-      - Para isso, tive que configurar a API para aceitar `CORS` (requisições advindas da nova URL pública do `Cloud Run`) e o deploy `CI/CD` integrado com o `GCP` funcionou normalmente!
+      - **08/07**:
+        - De início, modifiquei o frontend para ter uma navbar superior e conseguir navegar entre as páginas de:
+          - Visualização de notas;
+          - Envio de notas para processamento (já tinha);
+          - Excluir linhas da tabela.
+        - Em seguida desenvolvi as telas de visualização e excluir, integrando elas com, respectivamente, os métodos `GET` e `DELETE` que já tinham sido desenvolvidos na API
+        - Depois, estudando diferentes serviços para fazer a implementação do front no `GCP` defini o `Cloud Run` para o rodar a imagem `Docker` que já tinha desenvolvido
+        - Pra isso, estudei como fazia uma implementação `CI/CD` com o GitHub, onde cada vez que eu faço um commit, o GitHub automaticamente builda a imagem, sobe num repositório de imagens do `GCP` (`Artifact Registry`) e atualiza o container rodando no `Cloud Run` com a versão mais atualizada da imagem!!
+          - Criei o repositório no `Artifact Registry`
+              ![artifact](./docs/imgs/artifact.png) 
+          - Criei uma conta de serviço com permissões para acessar o `Artifact Registry` e o `Cloud Run`
+              ![service](./docs/imgs/service.png) 
+          - Resgatei as credenciais dessa conta e salvei como variáveis de ambiente no repositório do GitHub
+          - Desenvolvi o arquivo `yml` que executa os passos necessários para o deploy após cada commit
+        - Para isso, tive que configurar a API para aceitar `CORS` (requisições advindas da nova URL pública do `Cloud Run`) e o deploy `CI/CD` integrado com o `GCP` funcionou normalmente!
       - Evolução: 100%
 
-    - **10/07**:
-      - Estudei o padrão de diagramas de arquiteturas GCP
-      - Desenhei o diagrama da arquitetura serverless que estou utilizando para a análise de images
-      - Aprimorei o front-end, adicionando um placeholder de loading enquanto o front faz a requisição para a API
+      - **10/07**:
+        - Estudei o padrão de diagramas de arquiteturas GCP
+        - Desenhei o diagrama da arquitetura serverless que estou utilizando para a análise de images
+        - Aprimorei o front-end, adicionando um placeholder de loading enquanto o front faz a requisição para a API
       - Evolução: 100%
 
     ![arquitetura](./docs/imgs/arquitetura.png) 
@@ -120,15 +120,32 @@
 - **Respostas das Questões**
     - \<RESPOSTAS\>
 
-## SEMANA 3: \<NOME DO PROJETO\>
-### Objetivo: \<OBJETIVO DA SEMANA\>
+## SEMANA 3: Analizador de documentos via IA
+### Objetivo: Refatorar CI/CD do GitHub Actions para Cloud Build (GCP)
 **14/07 - 17/07**
 - **Backlog Semanal**
-    - \<QUEBRAR O OBJETIVO DA SEMANA EM PARTES MENORES\>
+    - Estudar definições de `yaml` para deploy automatizado no Cloud Build ✅
+    - Definir arquivo `yaml` e desenvolver deploy do front no Cloud Run ✅
+    - Definir arquivo `yaml` e desenvolver deploy do back no Cloud Run Functions ✅
+    - Redesenhar diagrama de arquitetura ✅
 
 - **Resultado Esperado**
-    - \<QUAL ENTREGÁVEL SERÁ PRODUZIDO QUANDO O OBJETIVO FOR ALCANÇADO (FINAL DA SEMANA)\>
-    - Evolução: \<0% - 100%\>
+    - Pipeline CI/CD (antes implementada via GitHub Actions) funcional utilizando `Cloud Build`
+      - **15/07**:
+        - Defini o arquivo `yaml` de build para o front com as seguintes etapas:
+          - Builda a imagem docker do front e *tagueia* ela com a url do repositório do `Artifact Registry`
+          - Faz o push da imagem
+          - Faz o *re-deploy* do container rodando no **Cloud Run** com a nova versão da imagem
+        - Linkei minha conta do GitHub com o Cloud Build e instalei o Cloud Build no meu repositório
+        - Configurei um *trigger* no Cloud Build para executar toda vez que houver uma alteração na pasta `front/` do meu repositório
+        ![front_build](./docs/imgs/front_build.png) 
+        ![front_build_2](./docs/imgs/front_build_2.png) 
+        - Refiz as mesmas etapas para o backend, desenvolvendo um arquivo `yaml` diferente para tal fim
+        - Ou seja, quando há um `push` para as branches especificadas no meu GitHub, ele verifica:
+          - Houve mudança na pasta `front/`? -> Faz build do front
+          - Houve mudança na pasta `api/`? -> Faz build do backend
+        - Por fim, redesenhei o diagrama da arquitetura substituindo o GitHub Actions pelo Cloud Build
+    - Evolução: 100%
 
 - **Dúvidas do Aluno/Impedimentos Encontrados**
     - \<DÚVIDAS\>
@@ -183,6 +200,11 @@ O ambiente local deve estar num ambiente virtual, criado com o "venv", e os paco
     - https://aistudio.google.com/apikey
 - Frontend
     - https://v3.tailwindcss.com/docs/guides/create-react-app
+- GCP
+    - https://cloud.google.com/sql/docs/mysql/connect-functions
+    - https://cloud.google.com/api-gateway/docs/openapi-overview
+    - https://cloud.google.com/build/docs/configuring-builds/create-basic-configuration
+    - https://www.youtube.com/watch?v=-1oKeXXdIn0
 
 ## Passo a Passo do Projeto
 1. Fazer o setup do ambiente
