@@ -8,12 +8,11 @@ steps:
         'functions', 'deploy', 'get-avaliacao',
         '--gen2',
         '--runtime=python311',
-        '--region=europe-west1',
+        '--region=us-central1',
         '--entry-point=get',
         '--source=api/gcp_refactor/get',
         '--trigger-http',
-        '--allow-unauthenticated',
-        --overwrite
+        '--allow-unauthenticated'
       ]
 
   # --- Deploy POST ---
@@ -25,12 +24,11 @@ steps:
         'functions', 'deploy', 'post-avaliacao',
         '--gen2',
         '--runtime=python311',
-        '--region=europe-west1',
+        '--region=us-central1',
         '--entry-point=post',
         '--source=api/gcp_refactor/post',
         '--trigger-http',
-        '--allow-unauthenticated',
-        --overwrite
+        '--allow-unauthenticated'
       ]
 
   # --- Deploy DELETE ---
@@ -42,12 +40,11 @@ steps:
         'functions', 'deploy', 'delete-avaliacao',
         '--gen2',
         '--runtime=python311',
-        '--region=europe-west1',
+        '--region=us-central1',
         '--entry-point=delete',
         '--source=api/gcp_refactor/delete',
         '--trigger-http',
-        '--allow-unauthenticated',
-        --overwrite
+        '--allow-unauthenticated'
       ]
 
 options:
