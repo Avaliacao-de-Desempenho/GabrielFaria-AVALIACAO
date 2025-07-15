@@ -33,7 +33,7 @@ const ListarNotas = () => {
   // Formata cada um dos dados do payload em um componente separado no formato de lista
   return (
     <div className="p-6">
-      <h2 className="text-xl font-bold mb-4">Notas Registradas</h2>
+      <h2 className="text-xl font-bold mb-4">Notas Fiscais Registradas</h2>
 
       {erro && <div className="text-red-600">{erro}</div>}
 
