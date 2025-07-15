@@ -6,6 +6,8 @@ import functions_framework
 import psycopg
 import requests
 
+# Implementação Cloud Build
+
 
 def conectar_banco():
     """
