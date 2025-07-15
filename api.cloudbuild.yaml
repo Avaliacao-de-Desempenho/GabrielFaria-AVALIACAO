@@ -9,7 +9,7 @@ steps:
         '--gen2',
         '--runtime=python311',
         '--region=us-central1',
-        '--entry-point=handle_request',
+        '--entry-point=get',
         '--source=api/gcp_refactor/get',
         '--trigger-http',
         '--allow-unauthenticated'
@@ -25,7 +25,7 @@ steps:
         '--gen2',
         '--runtime=python311',
         '--region=us-central1',
-        '--entry-point=handle_request',
+        '--entry-point=post',
         '--source=api/gcp_refactor/post',
         '--trigger-http',
         '--allow-unauthenticated'
@@ -41,7 +41,7 @@ steps:
         '--gen2',
         '--runtime=python311',
         '--region=us-central1',
-        '--entry-point=handle_request',
+        '--entry-point=delete',
         '--source=api/gcp_refactor/delete',
         '--trigger-http',
         '--allow-unauthenticated'
