@@ -12,7 +12,8 @@ steps:
         '--entry-point=get',
         '--source=api/gcp_refactor/get',
         '--trigger-http',
-        '--allow-unauthenticated'
+        '--allow-unauthenticated',
+        --overwrite
       ]
 
   # --- Deploy POST ---
@@ -28,7 +29,8 @@ steps:
         '--entry-point=post',
         '--source=api/gcp_refactor/post',
         '--trigger-http',
-        '--allow-unauthenticated'
+        '--allow-unauthenticated',
+        --overwrite
       ]
 
   # --- Deploy DELETE ---
@@ -44,7 +46,8 @@ steps:
         '--entry-point=delete',
         '--source=api/gcp_refactor/delete',
         '--trigger-http',
-        '--allow-unauthenticated'
+        '--allow-unauthenticated',
+        --overwrite
       ]
 
 options:
