@@ -16,7 +16,7 @@ paths:
           schema:
             type: string
       x-google-backend:
-        address: https://get-avaliacao-314988402732.europe-west1.run.app
+        address: https://us-central1-sapient-flight-465213-n9.cloudfunctions.net/get-avaliacao
         protocol: h2
       x-google-extensions:
         cors:
@@ -34,7 +34,7 @@ paths:
           schema:
             type: string
       x-google-backend:
-        address: https://post-avaliacao-314988402732.europe-west1.run.app
+        address: https://us-central1-sapient-flight-465213-n9.cloudfunctions.net/post-avaliacao
         protocol: h2
       x-google-extensions:
         cors:
@@ -51,7 +51,7 @@ paths:
           schema:
             type: string
       x-google-backend:
-        address: https://delete-avaliacao-314988402732.europe-west1.run.app
+        address: https://us-central1-sapient-flight-465213-n9.cloudfunctions.net/delete-avaliacao
         protocol: h2
       x-google-extensions:
         cors:
