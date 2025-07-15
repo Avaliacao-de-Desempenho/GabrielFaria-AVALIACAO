@@ -1,0 +1,48 @@
+steps:
+  # --- Deploy GET ---
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'Deploy get-avaliacao'
+    args:
+      [
+        'functions', 'deploy', 'get-avaliacao',
+        '--gen2',
+        '--runtime=python311',
+        '--region=us-central1',
+        '--entry-point=handle_request',
+        '--source=api/gcp_refactor/get',
+        '--trigger-http',
+        '--allow-unauthenticated'
+      ]
+
+  # --- Deploy POST ---
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'Deploy post-avaliacao'
+    args:
+      [
+        'functions', 'deploy', 'post-avaliacao',
+        '--gen2',
+        '--runtime=python311',
+        '--region=us-central1',
+        '--entry-point=handle_request',
+        '--source=api/gcp_refactor/post',
+        '--trigger-http',
+        '--allow-unauthenticated'
+      ]
+
+  # --- Deploy DELETE ---
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'Deploy delete-avaliacao'
+    args:
+      [
+        'functions', 'deploy', 'delete-avaliacao',
+        '--gen2',
+        '--runtime=python311',
+        '--region=us-central1',
+        '--entry-point=handle_request',
+        '--source=api/gcp_refactor/delete',
+        '--trigger-http',
+        '--allow-unauthenticated'
+      ]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
