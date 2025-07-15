@@ -6,6 +6,8 @@ import functions_framework
 import psycopg
 import requests
 
+# Implementação Cloud Build
+
 
 def conectar_banco():
     """
@@ -86,7 +88,7 @@ def post(request):
                             Me retorne os campos Valor Total, CNPJ e Data de Emissão desta nota fiscal. 
                             Não me retorne nenhum texto adicional, além dos campos formatados nesse formato:
                             {
-                                "Valor": campo_valor_extraido_do_arquivo formatado como R$XXX.XX, lembre-se de trocar a vírgula por um ponto, deixando no formato americano de dinheiro, 
+                                "Valor": campo_valor_extraido_do_arquivo formatado como R$XXX.XX, lembre-se de trocar a vírgula por um ponto, deixando no formato americano de dinheiro (caso não encontre o dinheiro, deixe como R$0.00) (não esqueça do R$ na frente do valor), 
                                 "CNPJ": campo_cnpj_extraido_do_arquivo formatado como XX.XXX.XXX/XXXX-XX,
                                 "Data": campo_data_extraido_do_arquivo formatado como YYYY/MM/DD,
                             }

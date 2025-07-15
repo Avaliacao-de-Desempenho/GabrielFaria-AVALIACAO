@@ -1,0 +1,23 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'front/analizador-nf/front.Dockerfile', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/avaliacao-repo/front:latest', './front/analizador-nf']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/avaliacao-repo/front:latest']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      [
+        'run', 'deploy', 'front-app',
+        '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/avaliacao-repo/front:latest',
+        '--region', 'us-central1',
+        '--platform', 'managed',
+        '--allow-unauthenticated'
+      ]
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/avaliacao-repo/front:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

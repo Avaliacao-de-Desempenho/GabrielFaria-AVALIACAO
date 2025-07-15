@@ -3,7 +3,7 @@ name: Deploy React App to Cloud Run
 on:
   push:
     branches:
-      - main
+      - branch # Aqui antes estava main antes da substituição para o Cloud Build
 
 jobs:
   build-and-deploy:
